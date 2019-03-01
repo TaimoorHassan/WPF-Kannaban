@@ -3,11 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Kanaban"
+             xmlns:local="clr-namespace:Kanaban" 
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" Loaded="AListBox_OnLoaded" x:Name="control"
              d:DesignHeight="450" d:DesignWidth="350">
-    <GroupBox Style="{StaticResource MaterialDesignCardGroupBox}" Header="{Binding ElementName=control , Path=ListType}" Margin="4">
+    <GroupBox Style="{StaticResource MaterialDesignCardGroupBox}" Header="{Binding ElementName=control , Path=ListType , FallbackValue=Header}" Margin="4">
         <materialDesign:DialogHost x:Name="host">
             <Grid>
                 <ListBox  Name="lst" Drop="UIElement_OnDrop"  AllowDrop="True" PreviewMouseLeftButtonDown="UIElement_OnPreviewMouseLeftButtonDown">
@@ -42,7 +42,7 @@
                         </ContextMenu>
                     </ListBox.ContextMenu>
                 </ListBox>
-                <Button HorizontalAlignment="Right" Style="{StaticResource MaterialDesignFloatingActionButton}" Content="+" FontSize="35" VerticalContentAlignment="Top" VerticalAlignment="Bottom"  Margin="0,0,20,20" Click="Button_Click"/>
+                <Button HorizontalAlignment="Right" Style="{StaticResource MaterialDesignFloatingActionButton}" Content="+" FontSize="35" VerticalContentAlignment="Top" VerticalAlignment="Bottom"  Margin="0,0,20,20" Click="btn_add_click"/>
             </Grid>
         </materialDesign:DialogHost>
 

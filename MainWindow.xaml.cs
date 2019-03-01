@@ -30,48 +30,25 @@ namespace Kanaban
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
-            var a = Properties.Settings.Default.DefaultDatabaseLocation;
-            if (a.Length > 0)
-            {
-                try
-                {
-                    DB.InitializeDatabase(a);
-                }
-                catch (Exception exception)
-                {
-                    MessageBox.Show(exception.Message);
-                    DB.InitializeDatabase("KanabanDB");
-
-                }
-            }
-            else
-            {
-                DB.InitializeDatabase("KanabanDB");
-            }
+            DB.InitializeDatabase();
         }
 
 
         private void MainWindow_OnMouseDown(object sender, MouseButtonEventArgs e)
         {
+        }
+
+        private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
             
         }
-        private void Button_Click(object sender, RoutedEventArgs e)
+
+        private void btn_new_project_click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.ShowDialog();
-
-            if (ofd.FileName.Length == 0)
-            {
-                return;
-            }
-
-            DB.InitializeDatabase(ofd.FileName);
-            DatabaseChanged?.Invoke();
-        }
-
-        private void btnSettingsClick(object sender, RoutedEventArgs e)
-        {
-            new Settings().ShowDialog();
+            ProjectEdit pe = new ProjectEdit();
+            pe.Added += () => { };
+            host.DialogContent = pe;
+            host.IsOpen = true;
         }
     }
 
@@ -109,4 +86,3 @@ namespace Kanaban
         }
     }
 }
-

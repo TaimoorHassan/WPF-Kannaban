@@ -6,8 +6,8 @@ using MaterialDesignThemes.Wpf;
 
 namespace Kanaban
 {
-
     public delegate void SimpleEvent();
+
     /// <summary>
     /// Interaction logic for WorkItemEdit.xaml
     /// </summary>
@@ -19,7 +19,7 @@ namespace Kanaban
         public event SimpleEvent Added;
 
 
-        public WorkItemEdit(ListType type , WorkItem item = null)
+        public WorkItemEdit(ListType type, WorkItem item = null)
         {
             InitializeComponent();
             currentListType = type;
@@ -32,13 +32,12 @@ namespace Kanaban
                 CurrentItem = new WorkItem();
                 CurrentItem._id = ObjectId.NewObjectId();
                 isNewItem = true;
-
             }
         }
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            DialogHost.CloseDialogCommand.Execute(null , null);
+            DialogHost.CloseDialogCommand.Execute(null, null);
         }
 
         private void WorkItemEdit_OnLoaded(object sender, RoutedEventArgs e)
@@ -53,17 +52,11 @@ namespace Kanaban
             CurrentItem.Priority = (Priority) cmbPriority.SelectedIndex;
             CurrentItem.Type = currentListType;
 
-            if (isNewItem)
-            {
-                DB.WorItems.Insert(CurrentItem);
-            }
-            else
-            {
-                DB.WorItems.Update(CurrentItem);
-            }
+            DB.CurrentProject.Add(CurrentItem);
+
             Added?.Invoke();
-            
-            DialogHost.CloseDialogCommand.Execute(null , null);
+
+            DialogHost.CloseDialogCommand.Execute(null, null);
         }
     }
 }

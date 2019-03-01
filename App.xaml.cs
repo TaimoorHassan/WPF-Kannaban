@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows;
 
 namespace Kanaban
@@ -13,5 +9,9 @@ namespace Kanaban
     /// </summary>
     public partial class App : Application
     {
+        private void App_OnExit(object sender, ExitEventArgs e)
+        {
+            File.WriteAllText(DateTime.Now.ToString("yyyyMMdd_hhmmss") + ".txt", DB.logtext);
+        }
     }
 }

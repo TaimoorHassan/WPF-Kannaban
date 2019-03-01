@@ -8,32 +8,33 @@
       
         mc:Ignorable="d" Loaded="MainWindow_OnLoaded" Background="{StaticResource MaterialDesignDarkBackground}" 
         Title="MainWindow" Height="450" Width="800" MouseDown="MainWindow_OnMouseDown">
-    <Grid >
-        <Grid.RowDefinitions>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <materialDesign:ColorZone Mode="Accent" CornerRadius="5" Margin="3" Grid.ColumnSpan="3" Height="30" >
-            <Grid>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button  Padding="0" Height="22"  Width="34" Margin="0,0,10,0" Click="Button_Click">
-                        <materialDesign:PackIcon Kind="OpenInApp" />
-                    </Button>
-                    <Button  Padding="0" Height="22"  Width="34" Margin="0,0,10,0" Click="btnSettingsClick">
-                        <materialDesign:PackIcon Kind="Wrench" />
-                    </Button>
-                </StackPanel>
-            </Grid>
-        </materialDesign:ColorZone>
-        <local:BoardColumn Grid.Row="1" Grid.Column="0" ListType="TODO"></local:BoardColumn>
-        <local:BoardColumn Grid.Row="1" Grid.Column="1" ListType="Working"></local:BoardColumn>
-        <local:BoardColumn Grid.Row="1" Grid.Column="2" ListType="Done"></local:BoardColumn>
+    <materialDesign:DialogHost x:Name="host" CloseOnClickAway="True">
+        <Grid >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <materialDesign:ColorZone Mode="Accent" CornerRadius="5" Margin="3" Grid.ColumnSpan="3" Height="50" >
+                <Grid>
+                    <TextBlock Text="WPF-Kannaban" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"  />
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Button
+                            Content="{materialDesign:PackIcon Plus}" Padding="4" Margin="4"
+                            ToolTip="Icon" Click="btn_new_project_click"/>
+                        <ComboBox SelectionChanged="Selector_OnSelectionChanged" materialDesign:HintAssist.Hint="Current Project" materialDesign:HintAssist.IsFloating="True"   MinWidth="150" Margin="0,0,8,0" MaxWidth="250"></ComboBox>
+                    </StackPanel>
+                </Grid>
+            </materialDesign:ColorZone>
+            <local:BoardColumn Grid.Row="1" Grid.Column="0" ListType="TODO"></local:BoardColumn>
+            <local:BoardColumn Grid.Row="1" Grid.Column="1" ListType="Working"></local:BoardColumn>
+            <local:BoardColumn Grid.Row="1" Grid.Column="2" ListType="Done"></local:BoardColumn>
 
-    </Grid>
+        </Grid>
+    </materialDesign:DialogHost>
 
 </Window>

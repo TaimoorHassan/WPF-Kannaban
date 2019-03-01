@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -26,7 +28,6 @@ namespace Kanaban
             {
                 _listType = value;
                 OnPropertyChanged();
-
             }
         }
 
@@ -38,7 +39,7 @@ namespace Kanaban
 
         private void UIElement_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            ListBox parent = (ListBox)sender;
+            ListBox parent = (ListBox) sender;
 
 
             StaticHolder.dragSource = parent;
@@ -49,6 +50,7 @@ namespace Kanaban
                 DragDrop.DoDragDrop(parent, data, DragDropEffects.Move);
             }
         }
+
         private static object GetDataFromListBox(ListBox source, Point point)
         {
             if (source.InputHitTest(point) is UIElement element)
@@ -80,26 +82,23 @@ namespace Kanaban
 
         private void UIElement_OnDrop(object sender, DragEventArgs e)
         {
-            ListBox parent = (ListBox)sender;
+            ListBox parent = (ListBox) sender;
 
 
             if (StaticHolder.dragSource.Equals(parent)) return;
 
 
-
-
             object data = e.Data.GetData(typeof(WorkItem));
-            var currentItem = (WorkItem)data;
+            var currentItem = (WorkItem) data;
             StaticHolder.dragSource.Items.Remove(currentItem);
             parent.Items.Add(currentItem);
 
 
-
-
             currentItem.Type = ListType;
 
-            DB.WorItems.Update(currentItem._id, currentItem);
+            DB.CurrentProject.Add(currentItem);
             SortItems();
+            DB.Log($"{currentItem} Moved From {StaticHolder.dragSource.Name} to {parent.Name}");
         }
 
         private void SortItems()
@@ -109,6 +108,7 @@ namespace Kanaban
             {
                 items.Add((WorkItem) lstItem);
             }
+
             lst.Items.Clear();
             var a = items.OrderBy(x => x.Priority);
 
@@ -118,7 +118,7 @@ namespace Kanaban
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void btn_add_click(object sender, RoutedEventArgs e)
         {
             WorkItemEdit edit = new WorkItemEdit(ListType);
             edit.Added += LoadData;
@@ -128,16 +128,16 @@ namespace Kanaban
 
         private void AListBox_OnLoaded(object sender, RoutedEventArgs e)
         {
+            if (DesignerProperties.GetIsInDesignMode(this)) return;
             LoadData();
             MainWindow.Instance.DatabaseChanged += LoadData;
-
         }
 
         private void LoadData()
         {
             lst.Items.Clear();
-            var db = DB.WorItems;
-            foreach (var workItem in db.Find(x=>x.Type == ListType))
+            var db = DB.CurrentProject.WorkItems;
+            foreach (var workItem in db.FindAll(x => x.Type == ListType))
             {
                 lst.Items.Add(workItem);
             }
@@ -156,7 +156,7 @@ namespace Kanaban
         {
             if (lst.SelectedItem is WorkItem wi)
             {
-                DB.WorItems.Delete(x => x._id == wi._id);
+                DB.CurrentProject.Remove(wi);
                 LoadData();
             }
         }
@@ -170,24 +170,77 @@ namespace Kanaban
 
     public class DB
     {
-        private static LiteDatabase dbfile;
-        internal static LiteCollection<WorkItem> WorItems;
+        internal static string logtext = "Log Started At " + DateTime.Now;
 
-        public static void InitializeDatabase(string ofdFileName)
+        internal static void Log(string nlog)
         {
-            dbfile?.Dispose();
-            dbfile = null;
-            dbfile = new LiteDatabase(ofdFileName);
-            WorItems = dbfile.GetCollection<WorkItem>("WorkItems");
+            logtext += "\n";
+            logtext += nlog;
+        }
+
+        private static Project _project = null;
+
+        internal static Project CurrentProject
+        {
+            get => _project ?? new Project {_id = ObjectId.NewObjectId(), Name = "Default Project"};
+            set => _project = value;
+        }
+
+        private static LiteDatabase dbfile;
+        internal static LiteCollection<Project> Projects;
+
+        public static void InitializeDatabase()
+        {
+            dbfile = new LiteDatabase("Database.db");
+            Projects = dbfile.GetCollection<Project>("Projects");
+            _project = Projects.FindOne(x => x._id != ObjectId.Empty);
+        }
+    }
+
+    public class Project
+    {
+        public ObjectId _id { get; set; }
+        public string Name { get; set; }
+
+        public List<WorkItem> WorkItems { get; set; } = new List<WorkItem>();
+
+        public void Save()
+        {
+            DB.Projects.Upsert(this);
+            DB.CurrentProject = this;
+            
+        }
+
+
+        public void Add(WorkItem nested)
+        {
+            if (WorkItems.Exists(x => x._id == nested._id))
+            {
+                WorkItems.RemoveAll(x => x._id == nested._id);
+            }
+            else
+            {
+                WorkItems.Add(nested);
+            }
+
+            Save();
+        }
+
+
+        public void Remove(WorkItem wi)
+        {
+            var a = this.WorkItems.FindAll(x => x._id == wi._id);
+            var b = 3;
+
+            this.WorkItems.RemoveAll(x => x._id == wi._id);
+            this.Save();
         }
     }
 
     public class WorkItem
     {
-
         public WorkItem()
         {
-
         }
 
         public WorkItem(string title)
@@ -196,7 +249,6 @@ namespace Kanaban
             Title = title;
             Description = "No Description Provided";
             Priority = Priority.Normal;
-           
         }
 
         public WorkItem(string title, string description, Priority priority)
@@ -204,29 +256,36 @@ namespace Kanaban
             Title = title;
             Description = description;
             Priority = priority;
-
-           
         }
 
         public ObjectId _id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
+
+        public override string ToString()
+        {
+            return $"{nameof(Title)}: {Title}, {nameof(Description)}: {Description}";
+        }
+
         public string Color { get; set; }
         public ListType Type { get; set; }
         public Priority Priority { get; set; }
 
+        
     }
 
-    
 
     public enum Priority
     {
-        High, Normal , Low 
+        High,
+        Normal,
+        Low
     }
 
     public enum ListType
     {
-        Working, Done, TODO
+        Working,
+        Done,
+        TODO
     }
-
 }
