@@ -124,6 +124,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="README.md" />
     <None Include="ToDo" />
     <Content Include=".gitignore" />
   </ItemGroup>
