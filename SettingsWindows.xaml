@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="Kanaban.SettingsWindows"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Kanaban"
+        xmlns:properties="clr-namespace:Kanaban.Properties"
+        mc:Ignorable="d" Unloaded="Settings_OnUnloaded" 
+            Tag="SOME"
+             
+         Height="178.069" Width="525.762">
+    <StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Bottom" Text="Default Database Location"/>
+            <TextBox  Name="txtDbLocation" Margin="10,0,0,0" Text="{Binding Source={x:Static properties:Settings.Default}  , Path=DefaultDatabaseLocation , Mode=TwoWay , UpdateSourceTrigger=PropertyChanged}" Width="270"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Bottom" Text="Shared Database File"/>
+            <TextBox  Name="txtSharedDB" Margin="10,0,0,0" Text="{Binding Source={x:Static properties:Settings.Default}  , Path=SharedDB , Mode=TwoWay , UpdateSourceTrigger=PropertyChanged}" Width="270"/>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="Kanaban.ctNewProject"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Kanaban"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             Height="189.096" Width="305.718">
+    <StackPanel Margin="6">
+            <TextBox Name="txtName"    />
+            <TextBox Name="txtDescription"   />
+        <Button Click="ButtonBase_OnClick" Content="Save" HorizontalAlignment="Right" Margin="6"/>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Default Database Path : "/>
+            <TextBlock x:Name="txt">Data\<Run Text="{Binding ElementName=txtName , Path=Text}"/>DB</TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Name="txtdbpath" Text="{Binding ElementName=txt , Path=Text}" Width="260"></TextBox>
+             <Button Content="..." Padding="3" Width="33" ></Button>
+        </StackPanel>
+    </StackPanel>
+</UserControl>
