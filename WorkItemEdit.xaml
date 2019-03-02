@@ -12,7 +12,7 @@
         <TextBox Margin="8" materialDesign:HintAssist.Hint="Description" materialDesign:HintAssist.IsFloating="True" Name="txtDescription" MinWidth="120"/>
         <ComboBox Margin="8" materialDesign:HintAssist.Hint="Priority" materialDesign:HintAssist.IsFloating="True" Name="cmbPriority" MinWidth="120"/>
    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-       <Button IsDefault="True" Content="Save" Margin="6" Click="Button_Click"/>
+       <Button IsDefault="True" Content="Save" Margin="6" Click="btn_save_click"/>
        <Button IsCancel="True" Content="Cancel" Click="ButtonBase_OnClick" Margin="6"/>
    </StackPanel>
         </StackPanel>

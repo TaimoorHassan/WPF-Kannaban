@@ -3,11 +3,11 @@
 namespace Kanaban
 {
     /// <summary>
-    /// Interaction logic for Settings.xaml
+    /// Interaction logic for Preferences.xaml
     /// </summary>
-    public partial class Settings : Window
+    public partial class Preferences : Window
     {
-        public Settings()
+        public Preferences()
         {
             InitializeComponent();
         }
@@ -15,7 +15,6 @@ namespace Kanaban
         private void Settings_OnUnloaded(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.Save();
-            
         }
     }
 }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -39,15 +38,12 @@ namespace Kanaban
 
         private void UIElement_OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            ListBox parent = (ListBox) sender;
-
-
-            StaticHolder.dragSource = parent;
-            object data = GetDataFromListBox(StaticHolder.dragSource, e.GetPosition(parent));
+            StaticHolder.dragSource = this;
+            object data = GetDataFromListBox(StaticHolder.dragSource.lst, e.GetPosition(lst));
 
             if (data != null)
             {
-                DragDrop.DoDragDrop(parent, data, DragDropEffects.Move);
+                DragDrop.DoDragDrop(this, data, DragDropEffects.Move);
             }
         }
 
@@ -82,23 +78,18 @@ namespace Kanaban
 
         private void UIElement_OnDrop(object sender, DragEventArgs e)
         {
-            ListBox parent = (ListBox) sender;
-
-
-            if (StaticHolder.dragSource.Equals(parent)) return;
-
-
+            if (StaticHolder.dragSource.Equals(this)) return;
             object data = e.Data.GetData(typeof(WorkItem));
             var currentItem = (WorkItem) data;
-            StaticHolder.dragSource.Items.Remove(currentItem);
-            parent.Items.Add(currentItem);
+            StaticHolder.dragSource.lst.Items.Remove(currentItem);
+            this.lst.Items.Add(currentItem);
 
 
             currentItem.Type = ListType;
 
             DB.CurrentProject.Add(currentItem);
             SortItems();
-            DB.Log($"{currentItem} Moved From {StaticHolder.dragSource.Name} to {parent.Name}");
+            DB.Log($"{currentItem} Moved From {StaticHolder.dragSource.ListType} to {this.ListType}");
         }
 
         private void SortItems()
@@ -133,7 +124,7 @@ namespace Kanaban
             MainWindow.Instance.DatabaseChanged += LoadData;
         }
 
-        private void LoadData()
+        internal void LoadData()
         {
             lst.Items.Clear();
             var db = DB.CurrentProject.WorkItems;
@@ -165,12 +156,14 @@ namespace Kanaban
 
     class StaticHolder
     {
-        public static ListBox dragSource;
+        internal static string NewProjectName => "4A3C2DC7981E446EB81655F35493B1DA";
+
+        public static BoardColumn dragSource;
     }
 
     public class DB
     {
-        internal static string logtext = "Log Started At " + DateTime.Now;
+        internal static string logtext = "Log Started At " + DateTime.Now + " in " + Environment.CurrentDirectory;
 
         internal static void Log(string nlog)
         {
@@ -178,22 +171,41 @@ namespace Kanaban
             logtext += nlog;
         }
 
-        private static Project _project = null;
+        private static Project _project;
 
         internal static Project CurrentProject
         {
-            get => _project ?? new Project {_id = ObjectId.NewObjectId(), Name = "Default Project"};
+            get => _project ?? new Project {_id = ObjectId.NewObjectId(), Name = StaticHolder.NewProjectName};
             set => _project = value;
         }
 
         private static LiteDatabase dbfile;
         internal static LiteCollection<Project> Projects;
 
-        public static void InitializeDatabase()
+        public static Project InitializeDatabase()
         {
             dbfile = new LiteDatabase("Database.db");
             Projects = dbfile.GetCollection<Project>("Projects");
-            _project = Projects.FindOne(x => x._id != ObjectId.Empty);
+
+            var lastproject = Properties.Settings.Default.LastOpenedProject;
+            if (lastproject == null)
+            {
+                _project = Projects.FindOne(x => x._id != ObjectId.Empty);
+            }
+            else
+            {
+                try
+                {
+                    _project = Projects.FindOne(x => x.Name == lastproject);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    _project = Projects.FindOne(x => x._id != ObjectId.Empty);
+                }
+            }
+
+            return CurrentProject;
         }
     }
 
@@ -206,9 +218,30 @@ namespace Kanaban
 
         public void Save()
         {
-            DB.Projects.Upsert(this);
-            DB.CurrentProject = this;
+            if (Name == StaticHolder.NewProjectName)
+            {
+                DB.Projects.Insert(this);
+                var a = new ProjectEdit(this);
+                a.Added += (x) =>
+                {
+                    DB.Projects.Upsert(x);
+                    DB.CurrentProject = x;
+                    MainWindow.Instance.SelectProject(x);
+                };
+                MainWindow.Instance.host.DialogContent = a;
+                MainWindow.Instance.host.IsOpen = true;
+            }
+            else
+            {
+                DB.Projects.Upsert(this);
+                DB.CurrentProject = this;
+            }
             
+        }
+
+        public override string ToString()
+        {
+            return Name ?? _id.ToString();
         }
 
 
@@ -217,6 +250,7 @@ namespace Kanaban
             if (WorkItems.Exists(x => x._id == nested._id))
             {
                 WorkItems.RemoveAll(x => x._id == nested._id);
+                WorkItems.Add(nested);
             }
             else
             {
@@ -270,8 +304,6 @@ namespace Kanaban
         public string Color { get; set; }
         public ListType Type { get; set; }
         public Priority Priority { get; set; }
-
-        
     }
 
 

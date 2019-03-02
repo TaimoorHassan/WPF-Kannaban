@@ -8,6 +8,8 @@ namespace Kanaban
 {
     public delegate void SimpleEvent();
 
+    public delegate void ProjectAddedEventHandler(Project addedProject);
+
     /// <summary>
     /// Interaction logic for WorkItemEdit.xaml
     /// </summary>
@@ -45,7 +47,7 @@ namespace Kanaban
             cmbPriority.ItemsSource = Enum.GetNames(typeof(Priority));
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void btn_save_click(object sender, RoutedEventArgs e)
         {
             CurrentItem.Title = txtTitle.Text;
             CurrentItem.Description = txtDescription.Text;

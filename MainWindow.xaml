@@ -5,35 +5,43 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Kanaban"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-      
-        mc:Ignorable="d" Loaded="MainWindow_OnLoaded" Background="{StaticResource MaterialDesignDarkBackground}" 
-        Title="MainWindow" Height="450" Width="800" MouseDown="MainWindow_OnMouseDown">
+        xmlns:input="clr-namespace:Kanaban.Input"
+
+        mc:Ignorable="d" Loaded="MainWindow_OnLoaded" Background="{StaticResource MaterialDesignDarkBackground}"
+        Title="MainWindow" Height="450" Width="800">
     <materialDesign:DialogHost x:Name="host" CloseOnClickAway="True">
-        <Grid >
+        <Grid Name="MainGrid">
             <Grid.RowDefinitions>
-                <RowDefinition Height="50"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="50" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <materialDesign:ColorZone Mode="Accent" CornerRadius="5" Margin="3" Grid.ColumnSpan="3" Height="50" >
+            <materialDesign:ColorZone Mode="Dark" CornerRadius="5" Margin="3" Grid.ColumnSpan="3" Height="50">
                 <Grid>
-                    <TextBlock Text="WPF-Kannaban" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"  />
+                    <TextBlock Text="WPF-Kannaban" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               FontSize="20" />
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                         <Button
                             Content="{materialDesign:PackIcon Plus}" Padding="4" Margin="4"
-                            ToolTip="Icon" Click="btn_new_project_click"/>
-                        <ComboBox SelectionChanged="Selector_OnSelectionChanged" materialDesign:HintAssist.Hint="Current Project" materialDesign:HintAssist.IsFloating="True"   MinWidth="150" Margin="0,0,8,0" MaxWidth="250"></ComboBox>
+                            ToolTip="Icon" Click="btn_new_project_click" />
+                        <ComboBox Foreground="White" Name="cmbProjects" SelectionChanged="Selector_OnSelectionChanged"
+                                  materialDesign:HintAssist.Hint="Current Project"
+                                  materialDesign:HintAssist.IsFloating="True" MinWidth="150" Margin="0,0,8,0"
+                                  MaxWidth="250" />
+                        <Button  Visibility="{Binding ElementName=cmbProjects , Path=SelectedItem , Converter={StaticResource NullVisibilityConverter}}"
+                            Content="{materialDesign:PackIcon Delete}" Padding="5" Margin="3" Click="btn_delete_project_click"
+                            />
                     </StackPanel>
                 </Grid>
             </materialDesign:ColorZone>
-            <local:BoardColumn Grid.Row="1" Grid.Column="0" ListType="TODO"></local:BoardColumn>
-            <local:BoardColumn Grid.Row="1" Grid.Column="1" ListType="Working"></local:BoardColumn>
-            <local:BoardColumn Grid.Row="1" Grid.Column="2" ListType="Done"></local:BoardColumn>
-
+            <local:BoardColumn Grid.Row="1" Grid.Column="0" ListType="TODO" />
+            <local:BoardColumn Grid.Row="1" Grid.Column="1" ListType="Working" />
+            <local:BoardColumn Grid.Row="1" Grid.Column="2" ListType="Done" />
+            <materialDesign:Snackbar materialDesign:ColorZoneAssist.Mode="Dark" MessageQueue="{materialDesign:MessageQueue}" Name="snackbar" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" />
         </Grid>
     </materialDesign:DialogHost>
 

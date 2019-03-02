@@ -1,4 +1,4 @@
-﻿<Window x:Class="Kanaban.Settings"
+﻿<Window x:Class="Kanaban.Preferences"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Kanaban"
         xmlns:properties="clr-namespace:Kanaban.Properties"
         mc:Ignorable="d" Unloaded="Settings_OnUnloaded"
-        Title="Settings" Height="398.537" Width="552.261">
+        Title="Preferences" Height="398.537" Width="552.261">
     <StackPanel>
         <StackPanel Orientation="Horizontal">
             <TextBlock Text="Default Database Location"/>

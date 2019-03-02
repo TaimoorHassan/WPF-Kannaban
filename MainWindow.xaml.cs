@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -30,25 +31,90 @@ namespace Kanaban
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
-            DB.InitializeDatabase();
+            var cp = DB.InitializeDatabase();
+            SelectProject(cp);
         }
 
-
-        private void MainWindow_OnMouseDown(object sender, MouseButtonEventArgs e)
+        internal void SelectProject(Project p)
         {
+            if (p != null)
+            {
+                cmbProjects.Items.Clear();
+                var allprojects = DB.Projects.FindAll().ToList();
+                var index = allprojects.FindIndex(x => x._id == p._id);
+
+                foreach (var project in allprojects)
+                {
+                    cmbProjects.Items.Add(project);
+                }
+
+                cmbProjects.SelectedIndex = index;
+            }
+            else
+            {
+                NullifyData();
+            }
         }
+
+        private void NullifyData()
+        {
+            DB.CurrentProject = null;
+            cmbProjects.Items.Clear();
+            cmbProjects.SelectedIndex = -1;
+            DB.Projects.Foreach(x => { cmbProjects.Items.Add(x);});
+            
+            foreach (var boardColumn in MainGrid.Children.OfType<BoardColumn>())
+            {
+                boardColumn.lst.Items.Clear();
+            }
+            snackbar.MessageQueue.Enqueue("Project Unloaded");
+
+        }
+
 
         private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (cmbProjects.SelectedItem is Project p)
+            {
+                LoadProjectData(p);
+            }
             
         }
 
         private void btn_new_project_click(object sender, RoutedEventArgs e)
         {
             ProjectEdit pe = new ProjectEdit();
-            pe.Added += () => { };
+            pe.Added += SelectProject;
             host.DialogContent = pe;
             host.IsOpen = true;
+        }
+
+        internal void LoadProjectData(Project project)
+        {
+            if (project != null)
+            {
+                DB.CurrentProject = project;
+                foreach (var boardColumn in MainGrid.Children.OfType<BoardColumn>())
+                {
+                    boardColumn.LoadData();
+                }
+
+                snackbar.MessageQueue.Enqueue("Project Loaded : " + project.Name);
+            }
+        }
+
+        private void btn_delete_project_click(object sender, RoutedEventArgs e)
+        {
+            if (cmbProjects.SelectedItem is Project p)
+            {
+                DB.Projects.Delete(x => x._id == p._id);
+            }
+            NullifyData();
+        }
+
+        private void EditableTextBlock_OnTextEdited(string newtext)
+        {
+            MessageBox.Show(newtext);
         }
     }
 
