@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using LiteDB;
@@ -28,6 +24,7 @@ namespace Kanaban
 
         public static void Foreach<T>(this LiteCollection<T> col , Action<T> ac)
         {
+
             var en = col.FindAll().GetEnumerator();
             while (en.MoveNext())
             {

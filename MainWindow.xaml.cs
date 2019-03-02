@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -33,6 +34,12 @@ namespace Kanaban
         {
             var cp = DB.InitializeDatabase();
             SelectProject(cp);
+
+            // Create Log Folder
+            if (!Directory.Exists("Logs"))
+            {
+                Directory.CreateDirectory("Logs");
+            }
         }
 
         internal void SelectProject(Project p)
