@@ -11,7 +11,7 @@ namespace Kanaban
     {
         private void App_OnExit(object sender, ExitEventArgs e)
         {
-            File.WriteAllText(DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".txt", DB.logtext);
+            File.WriteAllText("Logs//" + DateTime.Now.ToString("yyyy_MM_dd_hh_mm_ss") + ".txt", DB.logtext);
         }
     }
 }
